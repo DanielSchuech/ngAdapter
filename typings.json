@@ -1,0 +1,9 @@
+{
+  "name": "ngadapter",
+  "dependencies": {},
+  "devDependencies": {},
+  "ambientDependencies": {
+    "angular": "github:DefinitelyTyped/DefinitelyTyped/angularjs/angular.d.ts#5256422ee72d2b1ab41bbb72eb47754e202b6bb8",
+    "jquery": "github:DefinitelyTyped/DefinitelyTyped/jquery/jquery.d.ts#56295f5058cac7ae458540423c50ac2dcf9fc711"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "ngadapter",
+  "version": "0.0.1",
+  "description": "Wrapper around ngUpgrade to extend the support to attribute directives",
+  "main": "ngAdapter.js",
+  "scripts": {
+    "build2": "browserify src/ngAdapter.ts -p [ tsify ] > build/ngAdapter.js",
+    "build": "tsc",
+    "watch": "watch \"npm run build\" src",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DanielSchuech/ngAdapter.git"
+  },
+  "author": "Daniel Schuech",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DanielSchuech/ngAdapter/issues"
+  },
+  "homepage": "https://github.com/DanielSchuech/ngAdapter#readme",
+  "peerDependencies": {
+    "angular": "^1.5.3",
+    "angular2": "^2.0.0-beta.12",
+    "es6-shim": "^0.35.0",
+    "reflect-metadata": "0.1.2",
+    "rxjs": "5.0.0-beta.2",
+    "zone.js": "^0.6.6"
+  },
+  "devDependencies": {
+    "browserify": "^13.0.0",
+    "tsify": "^0.14.1",
+    "watch": "^0.17.1"
+  }
+}
