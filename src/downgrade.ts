@@ -1,5 +1,6 @@
 import {UpgradeAdapter} from 'angular2/upgrade';
 import {ElementRef} from 'angular2/core';
+import {getFunctionName} from './helper';
 
 export class Downgrade {
   constructor(private upgradeAdapter: UpgradeAdapter, private module: angular.IModule) {
@@ -126,10 +127,4 @@ function addHostsBinding(metadata: any, element: Element, directiveScope: any) {
   });
   
   //TODO: remove event listener on directive destroy
-}
-
-function getFunctionName(fn: Function): string {
-  let name = fn.toString();
-  let reg = /function ([^\(]*)/;
-  return reg.exec(name)[1];
 }
