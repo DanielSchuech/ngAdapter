@@ -29,17 +29,26 @@
     "zone.js": "^0.6.6"
   },
   "devDependencies": {
+    "angular": "^1.5.3",
+    "angular2": "^2.0.0-beta.12",
     "browserify": "^13.0.0",
     "browserify-istanbul": "^2.0.0",
+    "es6-shim": "^0.35.0",
     "jasmine-core": "^2.4.1",
+    "karma": "^0.13.22",
     "karma-browserify": "^5.0.3",
     "karma-chrome-launcher": "^0.2.3",
     "karma-coverage": "^0.5.5",
     "karma-jasmine": "^0.3.8",
     "karma-jasmine-html-reporter": "^0.2.0",
+    "reflect-metadata": "0.1.2",
+    "rxjs": "5.0.0-beta.2",
     "through2": "^2.0.1",
     "tsify": "^0.14.1",
+    "typescript": "^1.8.9",
+    "typings": "^0.7.12",
     "watch": "^0.17.1",
-    "watchify": "^3.7.0"
+    "watchify": "^3.7.0",
+    "zone.js": "^0.6.6"
   }
 }
