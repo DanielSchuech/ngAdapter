@@ -2,6 +2,8 @@ import {UpgradeAdapter} from 'angular2/upgrade';
 import {ElementRef} from 'angular2/core';
 import {getFunctionName} from './helper';
 
+declare var Reflect: any;
+
 export class Downgrade {
   constructor(private upgradeAdapter: UpgradeAdapter, private module: angular.IModule) {
     
@@ -30,12 +32,15 @@ export class Downgrade {
           let deps = getDependencies(directive, el, $injector);
           
           // combine scope and prototype functions
-          let directiveScope = angular.extend({}, scope, directive.prototype);
+          let prototypes = Object.keys(directive.prototype);
+          prototypes.forEach((prototypeKey: string) => {
+            scope[prototypeKey] = directive.prototype[prototypeKey];
+          });
           
           //create Directive
-          directive.apply(directiveScope, deps);
+          directive.apply(scope, deps);
           
-          addHostsBinding(metadata, element[0], directiveScope);
+          addHostsBinding(metadata, element[0], scope);
         }
       };
     }
@@ -112,7 +117,7 @@ function getDependencies(directive: any, el: ElementRef,
  * adds the event bindings given in the host attribute of the directive metadata
  */
 function addHostsBinding(metadata: any, element: Element, directiveScope: any) {
-  let hostKeys = Object.keys(metadata.host);
+  let hostKeys = Object.keys(metadata.host || {});
   hostKeys && hostKeys.forEach((key) => {
     let keyReg = /([A-Z,a-z,0-9]+)/;
     let event = keyReg.exec(key)[0];
@@ -120,7 +125,7 @@ function addHostsBinding(metadata: any, element: Element, directiveScope: any) {
     let fnReg = /([A-Z,a-z,0-9]+)/;
     let fnName = fnReg.exec(metadata.host[key])[0];
     
-    element.addEventListener(event, (event: any) => {
+    element.addEventListener(event, () => {
       directiveScope[fnName]();
     });
     

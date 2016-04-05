@@ -1,12 +1,10 @@
 import {UpgradeAdapter} from 'angular2/upgrade';
 import {ElementRef, Type, Directive, Injector, Input, EventEmitter,
-    OnInit, OnDestroy} from 'angular2/core';
+    OnInit, OnChanges, SimpleChange} from 'angular2/core';
 
 export class Upgrade {
   constructor(private upgradeAdapter: UpgradeAdapter, private module: angular.IModule,
-    private addedProvider: any, private upgradedProviders: string[]) {
-    
-  }
+    private addedProvider: any, private upgradedProviders: string[]) {}
   
   upgradeNg1Directive(directive: string): Type {
     let directiveFnOrArray = this.searchDirective(directive);
@@ -89,7 +87,7 @@ export class Upgrade {
    */
   createDirective(selector: string, fn: Function, deps: string[]) {
     //evaluate bindings
-    let bindings = Object.keys(fn().scope);
+    let bindings = Object.keys(fn().scope || {});
     
     //evaluate events
     let events: string[] = []
@@ -108,7 +106,7 @@ export class Upgrade {
     let upgradedProviders = this.upgradedProviders;
     
     @Directive(properties)
-    class ngAdapterDirective implements OnInit, OnDestroy {
+    class ngAdapterDirective implements OnInit, OnChanges {
       private bindingIntervall: any;
       
       constructor(private injector: Injector, private element: ElementRef) {
@@ -119,18 +117,7 @@ export class Upgrade {
       }
       
       ngOnInit() {
-        //determine bindings
         let scope = <any>this;
-        
-        /**
-         * TODO: investigate performance
-         * emits events for two way binding
-         */ 
-        this.bindingIntervall = setInterval(() => {
-          bindings.forEach((binding: string) => {
-            (<any>this)[binding + 'Changed'].next(scope[binding]);
-          });
-        }, 10);
         
         let dependencies = determineDependencies(deps, this.injector, addedProviders,
           upgradedProviders);
@@ -140,8 +127,21 @@ export class Upgrade {
         directive.link(scope, [this.element.nativeElement], {});
       }
       
-      ngOnDestroy() {
-        clearInterval(this.bindingIntervall);
+      ngOnChanges(changes: {[propName: string]: SimpleChange}) {
+        /**
+         * emits events for two way binding
+         */ 
+        let scope = <any>this;
+        let keys = Object.keys(changes);
+
+        //timeout need that new value is available
+        setTimeout(() => {
+          keys.forEach((key: string) => {
+            if (bindings.indexOf(key) > -1) {
+              scope[key + 'Changed'].next(scope[key]);
+            }
+          });
+        });
       }
     }
     

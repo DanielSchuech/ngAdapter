@@ -23,7 +23,7 @@ export class ngAdapter {
   }
   
   bootstrap(element: Element, app: string[]) {
-    this.upgradeAdapter.bootstrap(element, app);
+    return <any>this.upgradeAdapter.bootstrap(element, app);
   }
   
   downgradeNg2Component(cmp: Type): Function {
