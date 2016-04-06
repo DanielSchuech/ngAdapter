@@ -93,8 +93,9 @@ module.exports = function(config) {
 
     coverageReporter: {
       reporters:[
-        {type: 'html', dir:'log/coverage/', subdir: '.'},
-        {type: 'cobertura', dir:'log/coverage/', subdir: '.'}
+        //{type: 'html', dir:'log/coverage/html', subdir: '.'},
+        //{type: 'cobertura', dir:'log/coverage/', subdir: '.'}
+        {type: 'lcov', dir:'log/coverage/', subdir: '.'}
       ],
     },
     

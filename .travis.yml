@@ -8,3 +8,9 @@ before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
   
+addons:
+  code_climate:
+    repo_token: 6002d87b3e18d5fb578e189a67e6b2ea0e6cb2b7440430bf301a8e4f3510cdd4
+
+after_script:
+  - codeclimate-test-reporter < log/coverage/lcov.info
