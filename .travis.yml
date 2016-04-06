@@ -5,6 +5,7 @@ node_js:
 before_script:
   - typings install
   - git reset --hard HEAD
+  - npm i codeclimate-test-reporter
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
   
