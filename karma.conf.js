@@ -13,6 +13,7 @@ module.exports = function(config) {
       'karma-browserify',
       'karma-jasmine',
       'karma-chrome-launcher',
+      'karma-firefox-launcher',
       'karma-jasmine-html-reporter',
       'karma-coverage'
     ],
@@ -23,7 +24,9 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'node_modules/es6-shim/es6-shim.min.js',
       'node_modules/angular2/bundles/angular2-polyfills.js',
+      'node_modules/angular2/es6/dev/src/testing/shims_for_IE.js',
       /*'node_modules/systemjs/dist/system.src.js',
       'node_modules/angular2/bundles/angular2.dev.js',
       'node_modules/angular2/bundles/upgrade.js',*/
@@ -50,10 +53,10 @@ module.exports = function(config) {
         coverageTransform,
         istanbul({ignore: ['**/*.html']})
       ],
-       plugin: [
-         ['tsify', {target: 'es5'}]
-       ]
-     },
+        plugin: [
+          ['tsify', {target: 'es5'}]
+        ]
+      },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
@@ -78,10 +81,10 @@ module.exports = function(config) {
     autoWatch: true,
     
     autoWatchBatchDelay: 2000,
-  
+
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: [process.env.TRAVIS ? 'Firefox' : 'Chrome'],
 
 
     // Continuous Integration mode
@@ -96,6 +99,6 @@ module.exports = function(config) {
     },
     
     //How long will Karma wait for a message from a browser before disconnecting from it (in ms).
-    browserNoActivityTimeout: 60000
+    browserNoActivityTimeout: 300000
   });
 }; 

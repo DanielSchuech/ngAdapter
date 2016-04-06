@@ -15,6 +15,8 @@ describe('Upgrade: ', () => {
   }
   
   beforeEach(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 300000;
+    
     ngUpgradeAdapter = new UpgradeAdapter;
     module = angular.module('testApp', []);
     let addedProviders: any = {};
