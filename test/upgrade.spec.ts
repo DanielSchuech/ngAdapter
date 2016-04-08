@@ -142,6 +142,49 @@ describe('Upgrade: ', () => {
       });
   });
   
+  it('function (&) binding', (done) => {
+    function ng1() {
+      return {
+        scope: {
+          fn: '&'
+        },
+        link: (scope: any, el: Element[], attrs: any) => {
+          scope.fn();
+        }
+      }
+    }
+    module.directive('ng1', ng1);
+    
+    @Component({
+      selector: 'ng2',
+      template: '<div ng1 [fn]="callMeFn"></div>',
+      directives: [adapter.upgradeNg1Directive('ng1')]
+    })
+    class ng2 {
+      public name = "ngAdapter"
+      callMe() {
+        /**
+         * function is called from another class
+         * check if this points correctly to ng2 class
+         */
+        expect(this.name).toEqual('ngAdapter');
+      }
+      public callMeFn = this.callMe.bind(this);
+    }
+    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    
+    spyOn(ng2.prototype, 'callMe').and.callThrough();
+    
+    let element = html('<ng2></ng2>');
+    adapter.bootstrap(element, ['testAppUpgrade'])
+      .ready((ref: any) => {
+        expect(ng2.prototype.callMe).toHaveBeenCalled();
+        ref.dispose();
+        deleteHtml(element);
+        done();
+      });
+  });
+  
   it('inject ng1 service via inline array notation', (done) => {
     module.service('ng1Service', ng1Service);
     adapter.upgradeNg1Provider('ng1Service');
