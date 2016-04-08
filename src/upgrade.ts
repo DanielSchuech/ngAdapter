@@ -1,6 +1,6 @@
 import {UpgradeAdapter} from 'angular2/upgrade';
 import {ElementRef, Type, Directive, Injector, Input, EventEmitter,
-    OnInit, OnChanges, SimpleChange} from 'angular2/core';
+    OnInit, DoCheck} from 'angular2/core';
 
 export class Upgrade {
   constructor(private upgradeAdapter: UpgradeAdapter, private module: angular.IModule,
@@ -106,13 +106,15 @@ export class Upgrade {
     let upgradedProviders = this.upgradedProviders;
     
     @Directive(properties)
-    class ngAdapterDirective implements OnInit, OnChanges {
+    class ngAdapterDirective implements OnInit, DoCheck {
       private bindingIntervall: any;
+      private oldBindingValues: any = {};
       
       constructor(private injector: Injector, private element: ElementRef) {
         bindings.forEach((binding: string) => {
           //setup output events for two way binding
           (<any>this)[binding + 'Changed'] = new EventEmitter<any>();
+          this.oldBindingValues[binding] = (<any>this)[binding];
         });
       }
       
@@ -127,20 +129,14 @@ export class Upgrade {
         directive.link(scope, [this.element.nativeElement], {});
       }
       
-      ngOnChanges(changes: {[propName: string]: SimpleChange}) {
-        /**
-         * emits events for two way binding
-         */ 
-        let scope = <any>this;
-        let keys = Object.keys(changes);
-
-        //timeout need that new value is available
-        setTimeout(() => {
-          keys.forEach((key: string) => {
-            if (bindings.indexOf(key) > -1) {
-              scope[key + 'Changed'].next(scope[key]);
-            }
-          });
+      ngDoCheck() {
+        bindings.forEach((binding) => {
+          let scope = <any>this;
+          if (this.oldBindingValues[binding] !== scope[binding]) {
+            //binding value changed
+            scope[binding + 'Changed'].next(scope[binding]);
+            this.oldBindingValues[binding] = scope[binding];
+          }
         });
       }
     }

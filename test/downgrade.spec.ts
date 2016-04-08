@@ -13,8 +13,8 @@ describe('Downgrade: ', () => {
   class ng1Service {
     public value = 'ng1Service';
   }
-  
-  beforeEach(() => {
+    
+  beforeEach(() => {    
     ngUpgradeAdapter = new UpgradeAdapter;
     module = angular.module('testApp', []);
     let addedProviders: any = {};
