@@ -15,7 +15,7 @@ describe('Upgrade: ', () => {
   }
   
   beforeEach(() => {    
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 300000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
     
     ngUpgradeAdapter = new UpgradeAdapter();
     module = angular.module('testAppUpgrade', []);
@@ -185,6 +185,48 @@ describe('Upgrade: ', () => {
       });
   });
   
+  it('broadcast & listen on scope', (done) => {
+    function ng1broadcast() {
+      return {
+        link: (scope: any, element: Element[], attrs: any) => {
+          scope.$broadcast('channel', 'helloNg2');
+        }
+      }
+    }
+    
+    let called = false;
+    function ng1listen() {
+      return {
+        link: (scope: any, el: Element[], attrs: any) => {
+          scope.$on('channel', (data: any) => {
+            expect(data).toEqual('helloNg2');
+            ref.dispose();
+            deleteHtml(element);
+            done();
+          });
+        }
+      }
+    }
+    module.directive('ng1listen', ng1listen);
+    module.directive('ng1broadcast', ng1broadcast);
+    
+    @Component({
+      selector: 'ng2',
+      template: '<div><div ng1listen></div><div ng1broadcast></div></div>',
+      directives: [adapter.upgradeNg1Directive('ng1listen'),
+        adapter.upgradeNg1Directive('ng1broadcast')]
+    })
+    class ng2 {}
+    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    
+    let element = html('<ng2></ng2>');
+    let ref: any;
+    adapter.bootstrap(element, ['testAppUpgrade'])
+      .ready((_ref: any) => {
+        ref = _ref;
+      });
+  });
+  
   it('inject ng1 service via inline array notation', (done) => {
     module.service('ng1Service', ng1Service);
     adapter.upgradeNg1Provider('ng1Service');
@@ -321,5 +363,5 @@ describe('Upgrade: ', () => {
         deleteHtml(element);
         done();
       });
-  });
+  });  
 });

@@ -32,7 +32,7 @@ module.exports = function(config) {
       'node_modules/angular2/bundles/upgrade.js',*/
       'node_modules/reflect-metadata/Reflect.js',
       {pattern: 'node_modules/reflect-metadata/Reflect.js.map', included: false, serve: true},
-      'node_modules/angular/angular.js',
+      'node_modules/angular/angular.js',     
       'test/**/*.spec.ts'
     ],
 
@@ -54,7 +54,11 @@ module.exports = function(config) {
         istanbul({ignore: ['**/*.html']})
       ],
         plugin: [
-          ['tsify', {target: 'es5'}]
+          ['tsify', {
+            target: 'es5',
+            declaration: true,
+            sourceMap: true,
+          }]
         ]
       },
 
@@ -84,7 +88,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: [process.env.TRAVIS ? 'Firefox' : 'Chrome'],
+    browsers: [process.env.TRAVIS ? 'Chrome' : 'Firefox'],
 
 
     // Continuous Integration mode

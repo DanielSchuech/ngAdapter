@@ -4,6 +4,7 @@ import {Type, ElementRef} from 'angular2/core';
 import {Downgrade} from './downgrade';
 import {Upgrade} from './upgrade';
 import {getFunctionName} from './helper';
+import {ScopeEvents} from './scopeevents';
 
 
 export class ngAdapter {
@@ -20,6 +21,7 @@ export class ngAdapter {
     this.downgrade = new Downgrade(this.upgradeAdapter, module);
     this.upgrade = new Upgrade(this.upgradeAdapter, module, this.addedProviders,
       this.upgradedProviders);
+    this.addProvider(ScopeEvents);
   }
   
   bootstrap(element: Element, app: string[]) {
@@ -48,6 +50,8 @@ export class ngAdapter {
   }
   
   upgradeNg1Directive(directive: string): Type {
+    //let upgrade = new Upgrade(this.upgradeAdapter, this.module, this.addedProviders,
+    //  this.upgradedProviders);
     return this.upgrade.upgradeNg1Directive(directive);
   }
   

@@ -1,6 +1,7 @@
 import {UpgradeAdapter} from 'angular2/upgrade';
 import {ElementRef, Type, Directive, Injector, Input, EventEmitter,
     OnInit, DoCheck} from 'angular2/core';
+import {ScopeEvents} from './scopeevents';
 
 export class Upgrade {
   constructor(private upgradeAdapter: UpgradeAdapter, private module: angular.IModule,
@@ -110,7 +111,8 @@ export class Upgrade {
       private bindingIntervall: any;
       private oldBindingValues: any = {};
       
-      constructor(private injector: Injector, private element: ElementRef) {
+      constructor(private injector: Injector, private element: ElementRef,
+          private scopeEvents: ScopeEvents) {
         bindings.forEach((binding: string) => {
           //setup output events for two way binding
           (<any>this)[binding + 'Changed'] = new EventEmitter<any>();
@@ -120,10 +122,14 @@ export class Upgrade {
       
       ngOnInit() {
         let scope = <any>this;
+        //setting up scope events
+        scope.$on = this.scopeEvents.$on.bind(this.scopeEvents);
+        scope.$broadcast = this.scopeEvents.$broadcast.bind(this.scopeEvents);
+        scope.$emit = this.scopeEvents.$emit.bind(this.scopeEvents);
         
         let dependencies = determineDependencies(deps, this.injector, addedProviders,
-          upgradedProviders);
-        
+          upgradedProviders); 
+
         let directive = fn(...dependencies);
         
         directive.link(scope, [this.element.nativeElement], {});
@@ -141,6 +147,15 @@ export class Upgrade {
       }
     }
     
+    /**
+     * Angular2 uses the name to find the directiv function
+     * change read-only name property to find the different upgraded directives
+     */
+    Object.defineProperty(ngAdapterDirective, "name", {
+      value: 'ngAdapterDirective_' + selector
+    });
+    
+    debugger
     return <any>ngAdapterDirective;
   }
 }
