@@ -408,6 +408,35 @@ describe('Upgrade: ', () => {
       });
   });
   
+  it('attrs', (done) => {
+    function ng1() {
+      return {
+        link: (scope: any, el: Element[], attrs: any) => {
+          expect(attrs.ng1).toEqual('');
+          expect(attrs.class).toEqual('testCSS');
+        }
+      }
+    }
+    module.directive('ng1', ng1);
+    
+    @Component({
+      selector: 'ng2',
+      template: '<div ng1 class="testCSS"></div>',
+      directives: [adapter.upgradeNg1Directive('ng1')]
+    })
+    class ng2 {}
+    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    
+    let element = html('<ng2></ng2>');
+    let ref: any;
+    adapter.bootstrap(element, ['testAppUpgrade'])
+      .ready((ref: any) => {
+        ref.dispose();
+        deleteHtml(element);
+        done();
+      });
+  });
+  
   it('scope $watch with function watchExpression', (done) => {
     function ng1() {
       return {
@@ -456,5 +485,5 @@ describe('Upgrade: ', () => {
         ref = _ref;
         ng2Scope.test = '123';
       });
-  });
+  });  
 });

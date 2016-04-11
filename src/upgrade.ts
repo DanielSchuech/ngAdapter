@@ -132,8 +132,9 @@ export class Upgrade {
           upgradedProviders); 
 
         let directive = fn(...dependencies);
+        let attrs = createAttrs(this.element);
         
-        directive.link(scope, [this.element.nativeElement], {});
+        directive.link(scope, [this.element.nativeElement], attrs);
       }
       
       ngDoCheck() {
@@ -200,4 +201,16 @@ function determineDependencies(deps: string[], injector: Injector, addedProvider
   });
 
   return dependencies;
+}
+
+/**
+ * create attrs object from attributes NamedNodeMap
+ */
+function createAttrs(element: ElementRef) {
+  let attrs: any = {};
+  let map = element.nativeElement.attributes;
+  for (let i = 0; i < map.length; i++) {
+    attrs[map[i].name] = map[i].value;
+  }
+  return attrs;
 }
