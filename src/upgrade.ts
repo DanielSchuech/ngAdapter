@@ -1,6 +1,6 @@
 import {UpgradeAdapter} from 'angular2/upgrade';
 import {ElementRef, Type, Directive, Injector, Input, EventEmitter,
-    OnInit, DoCheck} from 'angular2/core';
+    OnInit, DoCheck, NgZone} from 'angular2/core';
 import {ScopeEvents} from './scopeevents';
 import {Scope} from './scope';
 
@@ -115,7 +115,7 @@ export class Upgrade {
       private _watch:any = {} //listeners for scope watch
       
       constructor(private injector: Injector, private element: ElementRef,
-          private scopeEvents: ScopeEvents) {
+          private scopeEvents: ScopeEvents, private zone: NgZone) {
         bindings.forEach((binding: string) => {
           //setup output events for two way binding
           (<any>this)[binding + 'Changed'] = new EventEmitter<any>();
@@ -126,7 +126,7 @@ export class Upgrade {
       ngOnInit() {
         let scope = <any>this;
         //setting up scope 
-        Scope.setUp(scope, this.scopeEvents);
+        Scope.setUp(scope, this.scopeEvents, this.zone);
         
         let dependencies = determineDependencies(deps, this.injector, addedProviders,
           upgradedProviders); 

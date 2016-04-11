@@ -2,7 +2,7 @@
 
 import {ngAdapter} from '../src/ngAdapter.ts';
 import {UpgradeAdapter} from 'angular2/upgrade';
-import {Component, Injectable} from 'angular2/core';
+import {Component, Injectable, NgZone} from 'angular2/core';
 import {html, deleteHtml} from './helper';
 
 describe('Upgrade: ', () => {

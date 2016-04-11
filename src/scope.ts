@@ -1,10 +1,11 @@
 import {ScopeEvents} from './scopeevents';
+import {NgZone} from 'angular2/core';
 
 export class Scope {
   /**
    * setup scope with events, watch
    */
-  static setUp(scope: any, scopeEvents: ScopeEvents) {
+  static setUp(scope: any, scopeEvents: ScopeEvents, zone: NgZone) {
     //setting up scope events
     scope.$on = scopeEvents.$on.bind(scopeEvents);
     scope.$broadcast = scopeEvents.$broadcast.bind(scopeEvents);
@@ -12,6 +13,8 @@ export class Scope {
     
     //setting up scope watch
     this.addScopeWatch(scope);
+    
+    this.addScopeApply(scope, zone);
   }
   
   /**
@@ -45,5 +48,9 @@ export class Scope {
     if (listener) {
       listener(newVal, oldVal, scope);
     }
+  }
+  
+  static addScopeApply(scope: any, zone: NgZone) {
+    scope.$apply = zone.run;
   }
 }
