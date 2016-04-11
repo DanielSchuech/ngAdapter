@@ -58,6 +58,7 @@ module.exports = function(config) {
             target: 'es5',
             declaration: true,
             sourceMap: true,
+            experimentalDecorators: true
           }]
         ]
       },
@@ -88,7 +89,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: [process.env.TRAVIS ? 'Chrome' : 'Firefox'],
+    browsers: [process.env.TRAVIS ? 'Firefox' : 'Chrome'],
 
 
     // Continuous Integration mode

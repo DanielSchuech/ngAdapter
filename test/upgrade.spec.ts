@@ -363,5 +363,98 @@ describe('Upgrade: ', () => {
         deleteHtml(element);
         done();
       });
-  });  
+  });
+  
+  it('scope $watch with string watchExpression', (done) => {
+    function ng1() {
+      return {
+        scope: {test: '='},
+        link: (scope: any, el: Element[], attrs: any) => {
+          scope.$watch('test', (newVal: any, oldVal: any, _scope: any) => {
+            // dont cover first change from undefined to abc
+            if (oldVal) {
+              expect(newVal).toEqual('123');
+              expect(oldVal).toEqual('abc');
+              expect(_scope).toEqual(scope);
+              
+              ref.dispose();
+              deleteHtml(element);
+              done();
+            }
+          })
+        }
+      }
+    }
+    module.directive('ng1', ng1);
+    
+    let ng2Scope: any;
+    @Component({
+      selector: 'ng2',
+      template: '<div ng1 [(test)]="test">{{test}}</div>',
+      directives: [adapter.upgradeNg1Directive('ng1')]
+    })
+    class ng2 {
+      public test = 'abc';
+      constructor() {ng2Scope = this; }
+    }
+    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    
+    let element = html('<ng2></ng2>');
+    let ref: any;
+    adapter.bootstrap(element, ['testAppUpgrade'])
+      .ready((_ref: any) => {
+        ref = _ref;
+        ng2Scope.test = '123';
+      });
+  });
+  
+  it('scope $watch with function watchExpression', (done) => {
+    function ng1() {
+      return {
+        scope: {test: '='},
+        link: (scope: any, el: Element[], attrs: any) => {
+          scope.$watch(
+            (_scope: any) => {
+              expect(scope).toEqual(_scope);
+              return 'test';
+            }, 
+            (newVal: any, oldVal: any, _scope: any) => {
+              // dont cover first change from undefined to abc
+              if (oldVal) {
+                expect(newVal).toEqual('123');
+                expect(oldVal).toEqual('abc');
+                expect(_scope).toEqual(scope);
+
+                ref.dispose();
+                deleteHtml(element);
+                done();
+              }
+            },
+            (a: any, b: any) => {return angular.equals(a,b)}
+          )
+        }
+      }
+    }
+    module.directive('ng1', ng1);
+    
+    let ng2Scope: any;
+    @Component({
+      selector: 'ng2',
+      template: '<div ng1 [(test)]="test"></div>',
+      directives: [adapter.upgradeNg1Directive('ng1')]
+    })
+    class ng2 {
+      public test = 'abc';
+      constructor() {ng2Scope = this; }
+    }
+    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    
+    let element = html('<ng2></ng2>');
+    let ref: any;
+    adapter.bootstrap(element, ['testAppUpgrade'])
+      .ready((_ref: any) => {
+        ref = _ref;
+        ng2Scope.test = '123';
+      });
+  });
 });

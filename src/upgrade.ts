@@ -2,6 +2,7 @@ import {UpgradeAdapter} from 'angular2/upgrade';
 import {ElementRef, Type, Directive, Injector, Input, EventEmitter,
     OnInit, DoCheck} from 'angular2/core';
 import {ScopeEvents} from './scopeevents';
+import {Scope} from './scope';
 
 export class Upgrade {
   constructor(private upgradeAdapter: UpgradeAdapter, private module: angular.IModule,
@@ -110,6 +111,8 @@ export class Upgrade {
     class ngAdapterDirective implements OnInit, DoCheck {
       private bindingIntervall: any;
       private oldBindingValues: any = {};
+      private _equals: any = {}; //selfdefined equals functions (i.e. in scope watch)
+      private _watch:any = {} //listeners for scope watch
       
       constructor(private injector: Injector, private element: ElementRef,
           private scopeEvents: ScopeEvents) {
@@ -122,10 +125,8 @@ export class Upgrade {
       
       ngOnInit() {
         let scope = <any>this;
-        //setting up scope events
-        scope.$on = this.scopeEvents.$on.bind(this.scopeEvents);
-        scope.$broadcast = this.scopeEvents.$broadcast.bind(this.scopeEvents);
-        scope.$emit = this.scopeEvents.$emit.bind(this.scopeEvents);
+        //setting up scope 
+        Scope.setUp(scope, this.scopeEvents);
         
         let dependencies = determineDependencies(deps, this.injector, addedProviders,
           upgradedProviders); 
@@ -138,9 +139,17 @@ export class Upgrade {
       ngDoCheck() {
         bindings.forEach((binding) => {
           let scope = <any>this;
-          if (this.oldBindingValues[binding] !== scope[binding]) {
+          let equals: Function = scope._equals[binding] || function (a: any, b: any) {return a === b; }; 
+          if (!equals(this.oldBindingValues[binding], scope[binding])) {
             //binding value changed
+            //emit output event
             scope[binding + 'Changed'].next(scope[binding]);
+            
+            //execute scope $watch
+            Scope.executeScopeWatchListener(binding, scope, this.oldBindingValues[binding], 
+              scope[binding]);
+            
+            //reset old binding value
             this.oldBindingValues[binding] = scope[binding];
           }
         });
@@ -155,7 +164,6 @@ export class Upgrade {
       value: 'ngAdapterDirective_' + selector
     });
     
-    debugger
     return <any>ngAdapterDirective;
   }
 }
