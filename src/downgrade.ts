@@ -1,6 +1,5 @@
 import {UpgradeAdapter} from 'angular2/upgrade';
 import {ElementRef} from 'angular2/core';
-import {getFunctionName} from './helper';
 
 declare var Reflect: any;
 
@@ -55,7 +54,7 @@ export class Downgrade {
   getMetadata(directive: any) {
     let metadata = Reflect.getOwnMetadata('annotations', directive)[0];
     if (!metadata) {
-      console.log('Error on finding metadata for directive: ' + getFunctionName(directive));
+      console.log('Error on finding metadata for directive: ' + directive.name);
       throw new Error();
     }
     return metadata;
@@ -67,7 +66,7 @@ export class Downgrade {
   downgradeProviders(providers: Function[]) {
     providers && providers.forEach((provider: Function) => {
       this.upgradeAdapter.addProvider(provider);
-      this.module.factory(getFunctionName(provider), 
+      this.module.factory((<any>provider).name, 
         this.upgradeAdapter.downgradeNg2Provider(provider));
     });
   }
@@ -98,7 +97,7 @@ function getDependencies(directive: any, el: ElementRef,
   let deps: any[] = [];
   let params: Function[] = Reflect.getMetadata('design:paramtypes', directive);
   params && params.forEach((dep: Function) => {
-    let dependencyName = getFunctionName(dep);
+    let dependencyName = (<any>dep).name;
     
     // ElementRef is a special case 
     if (dependencyName === 'ElementRef') {

@@ -1,9 +1,8 @@
 import {UpgradeAdapter} from 'angular2/upgrade';
-import {Type, ElementRef} from 'angular2/core';
+import {Type, ElementRef, Provider} from 'angular2/core';
 
 import {Downgrade} from './downgrade';
 import {Upgrade} from './upgrade';
-import {getFunctionName} from './helper';
 import {ScopeEvents} from './scopeevents';
 
 
@@ -21,7 +20,13 @@ export class ngAdapter {
     this.downgrade = new Downgrade(this.upgradeAdapter, module);
     this.upgrade = new Upgrade(this.upgradeAdapter, module, this.addedProviders,
       this.upgradedProviders);
+      
+    //add scope events service
     this.addProvider(ScopeEvents);
+    
+    //ng1 $timeout, $interval service
+    this.addProvider(new Provider('$timeout', {useValue: setTimeout}));
+    this.addProvider(new Provider('$interval', {useValue: setInterval}));
   }
   
   bootstrap(element: Element, app: string[]) {
@@ -40,8 +45,12 @@ export class ngAdapter {
     return <any>this.upgradeAdapter.downgradeNg2Provider(provider);
   }
   
-  addProvider(provider: any) {
-    this.addedProviders[getFunctionName(provider)] = provider;
+  addProvider(provider: Function|Provider) {
+    if (provider instanceof Provider) {
+      this.addedProviders[(<any>provider).token] = provider.token;
+    } else {
+       this.addedProviders[(<any>provider).name || (<any>provider).token] = provider;
+    }
     return this.upgradeAdapter.addProvider(provider);
   }
   

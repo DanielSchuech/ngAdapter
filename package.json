@@ -4,7 +4,7 @@
   "description": "Wrapper around ngUpgrade to extend the support to attribute directives",
   "main": "ngAdapter.js",
   "scripts": {
-    "build2": "browserify src/ngAdapter.ts -p [ tsify ] > build/ngAdapter.js",
+    "build2": "browserify typings/browser.d.ts src/ngAdapter.ts -p [ tsify ] --exclude angular2 > build/ngAdapter.js",
     "build": "tsc",
     "watch": "watch \"npm run build\" src",
     "test": "karma start --singleRun true",

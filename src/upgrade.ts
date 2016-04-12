@@ -9,7 +9,11 @@ export class Upgrade {
     private addedProvider: any, private upgradedProviders: string[]) {}
   
   upgradeNg1Directive(directive: string): Type {
-    let directiveFnOrArray = this.searchDirective(directive);
+    let directiveFnOrArray = this.searchDirective(directive, this.module);
+
+    if (!directiveFnOrArray) {
+      throw new Error('ngAdapter cannot find directive: ' + directive);
+    }
     let fn = this.evaluateDirectiveAndDeps(directiveFnOrArray);
     return this.createDirective(directive, fn.function, fn.dependencies);
     //return () => {};
@@ -18,17 +22,14 @@ export class Upgrade {
   /**
    * searches in angular.module for the directive and returns it
    */
-  searchDirective(directive:string): Function|Array<any> {
+  searchDirective(directive:string, module: angular.IModule): Function|Array<any> {
     /**
-     * invokeQuee contains all actions on angular.module
+     * invokeQueue contains all actions on angular.module
      * including controller, directive & service declarations
      */
-    let queue: any[] = (<any>this.module)._invokeQueue;
-    if (queue.length === 0) {
-      showError();
-    }
+    let queue: any[] = (<any>module)._invokeQueue;
     
-    let foundFunction: Function;    
+    let foundFunction: Function|Array<any>;    
     queue.forEach((action: any[]) => {
       if (action.length >= 3) {
         /**
@@ -42,13 +43,16 @@ export class Upgrade {
         }
       }
     });
-    if (!foundFunction) {showError(); }
+    if (!foundFunction && module.requires) {
+      //not found in current module -> search in required modules
+      for (let i = 0; i < module.requires.length; i++) {
+        foundFunction = this.searchDirective(directive, 
+          angular.module(module.requires[i]));
+        if (foundFunction) {break; }
+      }
+    }
     
     return foundFunction;
-    
-    function showError() {
-      throw new Error('Cannot find directive: ' + directive);
-    }
   }
   
   /**
@@ -134,7 +138,10 @@ export class Upgrade {
         let directive = fn(...dependencies);
         let attrs = createAttrs(this.element);
         
-        directive.link(scope, [this.element.nativeElement], attrs);
+        //add ng1 jquery addition to element
+        let el = angular.element([this.element.nativeElement]);
+        
+        directive.link(scope, el, attrs);
       }
       
       ngDoCheck() {
