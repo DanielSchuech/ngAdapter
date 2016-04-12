@@ -3,6 +3,7 @@ import {ElementRef, Type, Directive, Injector, Input, EventEmitter,
     OnInit, DoCheck, NgZone} from 'angular2/core';
 import {ScopeEvents} from './scopeevents';
 import {Scope} from './scope';
+import {camelToDash, dashToCamel} from './helper';
 
 export class Upgrade {
   constructor(private upgradeAdapter: UpgradeAdapter, private module: angular.IModule,
@@ -103,7 +104,7 @@ export class Upgrade {
     
     //evaluate properties
     let properties = {
-      selector: '[' + selector + ']',
+      selector: '[' + camelToDash(selector) + ']',
       properties: bindings,
       events: events
     }
@@ -217,7 +218,7 @@ function createAttrs(element: ElementRef) {
   let attrs: any = {};
   let map = element.nativeElement.attributes;
   for (let i = 0; i < map.length; i++) {
-    attrs[map[i].name] = map[i].value;
+    attrs[dashToCamel(map[i].name)] = map[i].value;
   }
   return attrs;
 }

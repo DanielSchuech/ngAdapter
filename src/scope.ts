@@ -51,6 +51,6 @@ export class Scope {
   }
   
   static addScopeApply(scope: any, zone: NgZone) {
-    scope.$apply = zone.run;
+    scope.$apply = zone.run.bind(zone);
   }
 }
