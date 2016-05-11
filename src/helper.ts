@@ -3,7 +3,7 @@ export function camelToDash(str: string) {
 }
 
 export function dashToCamel(str: string) {
-  return str.replace(/\W+(.)/g, function (x: any, chr: string) {
+  return str.replace(/[-,_](.)/g, function (x: any, chr: string) {
     return chr.toUpperCase();
   });
 }

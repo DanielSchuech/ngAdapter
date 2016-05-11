@@ -1,6 +1,6 @@
-import {UpgradeAdapter} from 'angular2/upgrade';
+import {UpgradeAdapter} from '@angular/upgrade';
 import {ElementRef, Type, Directive, Injector, Input, EventEmitter,
-    OnInit, DoCheck, NgZone} from 'angular2/core';
+    OnInit, DoCheck, NgZone} from '@angular/core';
 import {ScopeEvents} from './scopeevents';
 import {Scope} from './scope';
 import {camelToDash, dashToCamel} from './helper';

@@ -1,5 +1,5 @@
-import {UpgradeAdapter} from 'angular2/upgrade';
-import {ElementRef} from 'angular2/core';
+import {UpgradeAdapter} from '@angular/upgrade';
+import {ElementRef} from '@angular/core';
 
 declare var Reflect: any;
 

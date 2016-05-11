@@ -1,5 +1,5 @@
-import {UpgradeAdapter} from 'angular2/upgrade';
-import {Type, ElementRef, Provider} from 'angular2/core';
+import {UpgradeAdapter} from '@angular/upgrade';
+import {Type, ElementRef, Provider} from '@angular/core';
 
 import {Downgrade} from './downgrade';
 import {Upgrade} from './upgrade';

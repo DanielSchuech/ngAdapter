@@ -1,5 +1,5 @@
 import {ScopeEvents} from './scopeevents';
-import {NgZone} from 'angular2/core';
+import {NgZone} from '@angular/core';
 
 export class Scope {
   /**
