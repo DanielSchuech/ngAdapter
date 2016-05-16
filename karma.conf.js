@@ -25,15 +25,11 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'node_modules/es6-shim/es6-shim.min.js',
-      'node_modules/angular2/bundles/angular2-polyfills.js',
-      'node_modules/angular2/es6/dev/src/testing/shims_for_IE.js',
-      /*'node_modules/systemjs/dist/system.src.js',
-      'node_modules/angular2/bundles/angular2.dev.js',
-      'node_modules/angular2/bundles/upgrade.js',*/
       'node_modules/reflect-metadata/Reflect.js',
+      'node_modules/zone.js/dist/zone.js',
       {pattern: 'node_modules/reflect-metadata/Reflect.js.map', included: false, serve: true},
-      'node_modules/angular/angular.js',     
-      'test/**/*.spec.ts'
+      'node_modules/angular/angular.js',
+      `test/**/${process.argv[process.argv.indexOf('--part') + 1]}.spec.ts`
     ],
 
     // list of files to exclude
@@ -51,7 +47,7 @@ module.exports = function(config) {
       bundleDelay: 1500,
       transform: [
         coverageTransform,
-        istanbul({ignore: ['**/*.html']})
+        istanbul({ignore: ['**/*.html'], instrumenter: require('isparta')})
       ],
         plugin: [
           ['tsify', {
