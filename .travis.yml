@@ -1,3 +1,4 @@
+sudo: true
 language: node_js
 node_js:
   - "5"
@@ -10,6 +11,7 @@ before_script:
   - sh -e /etc/init.d/xvfb start
   
 addons:
+  firefox: "latest"
   code_climate:
     repo_token: 6002d87b3e18d5fb578e189a67e6b2ea0e6cb2b7440430bf301a8e4f3510cdd4
 
