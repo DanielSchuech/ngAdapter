@@ -96,7 +96,10 @@ module.exports = function(config) {
       reporters:[
         //{type: 'html', dir:'log/coverage/html', subdir: '.'},
         //{type: 'cobertura', dir:'log/coverage/', subdir: '.'}
-        {type: 'lcov', dir:'log/coverage/', subdir: '.'}
+        {type: 'html', dir:'log/coverage/', 
+          subdir: process.argv[process.argv.indexOf('--part') + 1]},
+        {type: 'lcovonly', dir:'log/coverage/', subdir: '.', 
+          file: process.argv[process.argv.indexOf('--part') + 1] + '.info'}
       ],
     },
     
