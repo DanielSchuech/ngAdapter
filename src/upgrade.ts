@@ -47,8 +47,14 @@ export class Upgrade {
     if (!foundFunction && module.requires) {
       //not found in current module -> search in required modules
       for (let i = 0; i < module.requires.length; i++) {
-        foundFunction = this.searchDirective(directive, 
-          angular.module(module.requires[i]));
+        try {
+          angular.module(module.requires[i]);
+          foundFunction = this.searchDirective(directive, 
+            angular.module(module.requires[i]));
+        } catch(e) {
+          //a module can be setted as required before it is created
+        }
+        
         if (foundFunction) {break; }
       }
     }

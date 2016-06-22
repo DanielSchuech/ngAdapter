@@ -512,5 +512,25 @@ describe('Upgrade: ', () => {
         ref = _ref;
         ng2Scope.test = '123';
       });
-  });  
+  });
+
+  it('module can has another module as require which does exists jet', (done) => {
+    module = angular.module('webendApp', ['notExistingModule', 'new']);
+    adapter = new ngAdapter(module);
+
+    angular.module('new', [])
+      .directive('ng1', () => {return {link: () => {}}; });
+
+    let dir = adapter.upgradeNg1Directive('ng1');
+
+    let element = html('<ng2></ng2>');
+    adapter.bootstrap(element, ['testAppUpgrade'])
+      .ready((ref: any) => {
+        expect(dir).toBeDefined();
+
+        ref.dispose();
+        deleteHtml(element);
+        done();
+      });
+  });
 });
