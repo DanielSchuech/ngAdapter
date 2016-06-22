@@ -1,6 +1,6 @@
 {
   "name": "ngadapter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Wrapper around ngUpgrade to extend the support to attribute directives",
   "main": "build/ngAdapter.js",
   "scripts": {
