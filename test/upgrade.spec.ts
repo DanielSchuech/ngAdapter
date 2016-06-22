@@ -38,6 +38,8 @@ describe('Upgrade: ', () => {
       }
     }
     module.directive('ng1', ng1);
+
+    let executedChagedEvent = false;
     @Component({
       selector: 'ng2',
       template: `<div ng1="stringTest" [testVar]="myVar" 
@@ -51,9 +53,13 @@ describe('Upgrade: ', () => {
         this.myVar = $event;
         expect($event).toEqual('changedFromNg1');
       
-        ref.dispose();
-        deleteHtml(element);
-        done();
+        // Angular RC3 will excute this befor bootstrap().ready
+        // Angular RC1 and lower execute this after befor bootstrap().ready
+        if (ref) {
+          ref.dispose();
+          deleteHtml(element); 
+          done();
+        }
       }
     }
     module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
@@ -63,6 +69,14 @@ describe('Upgrade: ', () => {
     adapter.bootstrap(element, ['testAppUpgrade'])
       .ready((_ref: any) => {
         ref = _ref;
+
+        // Angular RC1 and lower execute this before chagedEvent is fired, RC3 after
+        executedChagedEvent = true;
+        if (executedChagedEvent) {
+          ref.dispose();
+          deleteHtml(element); 
+          done();
+        }
       });
   });
   
@@ -194,15 +208,21 @@ describe('Upgrade: ', () => {
       }
     }
     
-    let called = false;
+    let executedChagedEvent = false;
     function ng1listen() {
       return {
         link: (scope: any, el: Element[], attrs: any) => {
           scope.$on('channel', (data: any) => {
             expect(data).toEqual('helloNg2');
-            ref.dispose();
-            deleteHtml(element);
-            done();
+
+            // Angular RC3 will excute this befor bootstrap().ready
+            // Angular RC1 and lower execute this after befor bootstrap().ready
+            executedChagedEvent = true;
+            if (ref) {
+              ref.dispose();
+              deleteHtml(element); 
+              done();
+            }
           });
         }
       }
@@ -224,6 +244,13 @@ describe('Upgrade: ', () => {
     adapter.bootstrap(element, ['testAppUpgrade'])
       .ready((_ref: any) => {
         ref = _ref;
+
+        // Angular RC1 and lower execute this before chagedEvent is fired, RC3 after
+        if (executedChagedEvent) {
+          ref.dispose();
+          deleteHtml(element); 
+          done();
+        }
       });
   });
   
