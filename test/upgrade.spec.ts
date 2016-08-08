@@ -533,4 +533,37 @@ describe('Upgrade: ', () => {
         done();
       });
   });
+
+  it('upgrade two directives', (done) => {
+    module
+      .directive('ng1_1', () => {return {link: ($scope, el) => {(<any>el)[0].innerHTML = '#1'; }}; })
+      .directive('ng1_2', () => {return {link: ($scope, el) => {(<any>el)[0].innerHTML = '#2'; }}; });
+
+    @Component({
+      selector: 'ng2',
+      template: `
+        <p ng1_1>abc</p>
+        <p ng1_2>abc</p>
+      `,
+      directives: [
+        adapter.upgradeNg1Directive('ng1_1'),
+        adapter.upgradeNg1Directive('ng1_2')
+      ]
+    })
+    class ng2 {}
+
+    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+
+    let element = html('<ng2></ng2>');
+    adapter.bootstrap(element, ['testAppUpgrade'])
+      .ready((ref: any) => {
+        let pElements = (<any>element).children[0].children;
+        expect(pElements[0].innerHTML).toEqual('#1');
+        expect(pElements[1].innerHTML).toEqual('#2');
+
+        ref.dispose();
+        deleteHtml(element);
+        done();
+      });
+  });
 });

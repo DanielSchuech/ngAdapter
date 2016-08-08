@@ -171,14 +171,6 @@ export class Upgrade {
       }
     }
     
-    /**
-     * Angular2 uses the name to find the directiv function
-     * change read-only name property to find the different upgraded directives
-     */
-    Object.defineProperty(ngAdapterDirective, "name", {
-      value: 'ngAdapterDirective_' + selector
-    });
-    
     return <any>ngAdapterDirective;
   }
 }
