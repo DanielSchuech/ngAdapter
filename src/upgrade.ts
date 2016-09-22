@@ -9,7 +9,7 @@ export class Upgrade {
   constructor(private upgradeAdapter: UpgradeAdapter, private module: angular.IModule,
     private addedProvider: any, private upgradedProviders: string[]) {}
   
-  upgradeNg1Directive(directive: string): Type {
+  upgradeNg1Directive(directive: string): Type<any> {
     let directiveFnOrArray = this.searchDirective(directive, this.module);
 
     if (!directiveFnOrArray) {
@@ -103,16 +103,16 @@ export class Upgrade {
     let bindings = Object.keys(fn().scope || {});
     
     //evaluate events
-    let events: string[] = []
+    let outputs: string[] = []
     bindings.forEach((binding: string) => {
-      events.push(binding + 'Changed: ' + binding + 'Change');
+      outputs.push(binding + 'Change');
     });
     
     //evaluate properties
     let properties = {
-      selector: '[' + camelToDash(selector) + ']',
-      properties: bindings,
-      events: events
+      selector: '[' + selector + ']',
+      inputs: bindings,
+      outputs: outputs
     }
     
     let addedProviders = this.addedProvider;
@@ -129,7 +129,7 @@ export class Upgrade {
           private scopeEvents: ScopeEvents, private zone: NgZone) {
         bindings.forEach((binding: string) => {
           //setup output events for two way binding
-          (<any>this)[binding + 'Changed'] = new EventEmitter<any>();
+          (<any>this)[binding + 'Change'] = new EventEmitter<any>();
           this.oldBindingValues[binding] = (<any>this)[binding];
         });
       }
@@ -158,7 +158,7 @@ export class Upgrade {
           if (!equals(this.oldBindingValues[binding], scope[binding])) {
             //binding value changed
             //emit output event
-            scope[binding + 'Changed'].next(scope[binding]);
+            scope[binding + 'Change'].next(scope[binding]);
             
             //execute scope $watch
             Scope.executeScopeWatchListener(binding, scope, this.oldBindingValues[binding], 
@@ -184,7 +184,7 @@ function determineDependencies(deps: string[], injector: Injector, addedProvider
   let dependencies: any[] = [];
   deps && deps.forEach((dep: string) => {
     //check if dependency is a ng2Provider
-    let depKeyNg2 = addedProviders[dep];
+    let depKeyNg2 = addedProviders.find((item: any) => item.name === dep);
     
     //check if dependency is a ng1Provider
     let depKeyNg1: string;

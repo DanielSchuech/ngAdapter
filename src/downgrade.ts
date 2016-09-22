@@ -65,8 +65,8 @@ export class Downgrade {
    */
   downgradeProviders(providers: Function[]) {
     providers && providers.forEach((provider: Function) => {
-      this.upgradeAdapter.addProvider(provider);
-      this.module.factory((<any>provider).name, 
+      // this.upgradeAdapter.addProvider(provider);
+      this.module.factory((<any>provider).name,
         this.upgradeAdapter.downgradeNg2Provider(provider));
     });
   }

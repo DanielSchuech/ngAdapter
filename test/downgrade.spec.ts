@@ -1,13 +1,13 @@
 ///<reference path="../typings/browser.d.ts" />
 
-import {ngAdapter} from '../src/ngAdapter.ts';
+import {ngAdapter} from '../src/ngAdapter';
 import {UpgradeAdapter} from '@angular/upgrade';
-import {Directive, ElementRef, Injectable, Input} from '@angular/core';
+import {Directive, ElementRef, Injectable, Input, 
+  NgModule, Component} from '@angular/core';
 import {html, deleteHtml} from './helper';
 
 describe('Downgrade: ', () => {
   let adapter: ngAdapter;
-  let ngUpgradeAdapter: UpgradeAdapter;
   let module: angular.IModule;
   
   class ng1Service {
@@ -15,7 +15,6 @@ describe('Downgrade: ', () => {
   }
     
   beforeEach(() => {
-    ngUpgradeAdapter = new UpgradeAdapter;
     module = angular.module('testApp', []);
     let addedProviders: any = {};
     let upgradedProviders: string[] = [];
@@ -48,7 +47,6 @@ describe('Downgrade: ', () => {
     class ng2Service {
       public value: string = 'ng2Service';
     }
-    adapter.addProvider(ng2Service);
     module.service('ng2Service', adapter.downgradeNg2Provider(ng2Service));
     
     @Directive({
@@ -59,6 +57,13 @@ describe('Downgrade: ', () => {
         element.nativeElement.textContent = service.value;
       }
     }
+
+    @NgModule({
+      declarations: [ng2],
+      providers: [ng2Service]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
     module.directive('ng2', <any>adapter.downgradeNg2Directive(ng2));
     
     let element = html('<div ng2>Hello World</div>');
@@ -103,16 +108,22 @@ describe('Downgrade: ', () => {
     class ng2Service {
       public value: string = 'ng2Service';
     }
+    module.service('ng2Service', adapter.downgradeNg2Provider(ng2Service));
     
     @Directive({
-      selector: '[ng2]',
-      providers: [ng2Service]
+      selector: '[ng2]'
     })
     class ng2 {
       constructor(service: ng2Service, element: ElementRef) {
         element.nativeElement.textContent = service.value;
       }
     }
+    @NgModule({
+      declarations: [ng2],
+      providers: [ng2Service]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
     module.directive('ng2', <any>adapter.downgradeNg2Directive(ng2));
     
     let element = html('<div ng2>Hello World</div>');
@@ -213,6 +224,52 @@ describe('Downgrade: ', () => {
         expect(el.addEventListener).toHaveBeenCalled();
         expect(event).toEqual('mouseenter');
         expect(fn instanceof Function).toBeTruthy();
+        ref.dispose();
+        deleteHtml(element);
+        done();
+      });
+  });
+
+  it('downgradeNg2Module', (done) => {
+    @Injectable()
+    class ng2Service {
+      public test = '123';
+    }
+
+    @Directive({
+      selector: '[ng2Dir]'
+    })
+    class ng2Dir {
+      constructor(el: ElementRef) {
+        el.nativeElement.style.backgroundColor = 'red';
+      }
+    }
+
+    @Component({
+      selector: 'ng2',
+      template: 'component'
+    })
+    class ng2 {}
+
+    @NgModule({
+      declarations: [ng2Dir, ng2],
+      providers: [ng2Service]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
+
+    //Inject new ng1 modul into testApp modul
+    angular.module('testApp').requires.push('Ng2Module');
+
+    let element = html('<ng2 ng2-dir></ng2>');
+    adapter.bootstrap(element, ['testApp'])
+      .ready((ref: any) => {
+        expect(ref.ng1Injector.get('ng2Service')).toBeDefined();
+        expect(ref.ng1Injector.get('ng2Service').test).toEqual('123');
+        expect((<any>element.firstChild).style.backgroundColor).toEqual('red');
+        expect(element.firstChild.textContent).toEqual('component');
+
         ref.dispose();
         deleteHtml(element);
         done();

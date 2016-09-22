@@ -1,13 +1,12 @@
 ///<reference path="../typings/browser.d.ts" />
 
-import {ngAdapter} from '../src/ngAdapter.ts';
+import {ngAdapter} from '../src/ngAdapter';
 import {UpgradeAdapter} from '@angular/upgrade';
-import {Component, Injectable, NgZone} from '@angular/core';
+import {Component, Injectable, NgModule, destroyPlatform} from '@angular/core';
 import {html, deleteHtml} from './helper';
 
 describe('Upgrade: ', () => {
   let adapter: ngAdapter;
-  let ngUpgradeAdapter: UpgradeAdapter;
   let module: angular.IModule;
   
   class ng1Service {
@@ -16,11 +15,12 @@ describe('Upgrade: ', () => {
   
   beforeEach(() => {    
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
-    
-    ngUpgradeAdapter = new UpgradeAdapter();
-    module = angular.module('testAppUpgrade', []);
+    destroyPlatform();
+    module = angular.module('testAppUpgrade', ['Ng2Module']);
     adapter = new ngAdapter(module);
   });
+
+  afterEach(() => destroyPlatform());
   
   it('two-way data binding via event attribute', (done) => {    
     function ng1() {
@@ -43,8 +43,7 @@ describe('Upgrade: ', () => {
     @Component({
       selector: 'ng2',
       template: `<div ng1="stringTest" [testVar]="myVar" 
-        (testVarChange)="changeEvent($event)">{{myVar}}</div>`,
-      directives: [adapter.upgradeNg1Directive('ng1')]
+        (testVarChange)="changeEvent($event)">{{myVar}}</div>`
     })
     class ng2 {
       public myVar: string = 'ng2Var';
@@ -52,31 +51,25 @@ describe('Upgrade: ', () => {
       changeEvent($event: any) {
         this.myVar = $event;
         expect($event).toEqual('changedFromNg1');
-      
-        // Angular RC3 will excute this befor bootstrap().ready
-        // Angular RC1 and lower execute this after befor bootstrap().ready
-        if (ref) {
-          ref.dispose();
-          deleteHtml(element); 
-          done();
-        }
+        executedChagedEvent = true;
       }
     }
-    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+
+    @NgModule({
+      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
     
     let element = html('<ng2></ng2>');
     let ref: any;
     adapter.bootstrap(element, ['testAppUpgrade'])
-      .ready((_ref: any) => {
-        ref = _ref;
-
-        // Angular RC1 and lower execute this before chagedEvent is fired, RC3 after
-        executedChagedEvent = true;
-        if (executedChagedEvent) {
-          ref.dispose();
-          deleteHtml(element); 
-          done();
-        }
+      .ready((ref: any) => {
+        expect(executedChagedEvent).toBeTruthy();
+        ref.dispose();
+        deleteHtml(element); 
+        done();
       });
   });
   
@@ -99,32 +92,34 @@ describe('Upgrade: ', () => {
     let scope: any;
     @Component({
       selector: 'ng2',
-      template: `<div ng1="stringTest" [(testVar)]="myVar">{{myVar}}</div>`,
-      directives: [adapter.upgradeNg1Directive('ng1')]
+      template: `<div ng1="stringTest" [(testVar)]="myVar">{{myVar}}</div>`
     })
     class ng2 {
       public myVar: string = 'ng2Var';
       
       constructor() {
         scope = this;
-        
       }
     }
-    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    @NgModule({
+      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
 
     let element = html('<ng2></ng2>');
     adapter.bootstrap(element, ['testAppUpgrade'])
       .ready((ref: any) => {
-        setTimeout(() => {
-          expect(scope.myVar).toEqual('changedFromNg1'); 
-          ref.dispose();
-          deleteHtml(element);
-          done();
-        }, 10);
+        expect(scope.myVar).toEqual('changedFromNg1'); 
+        ref.dispose();
+        deleteHtml(element);
+        done();
       });
   });
   
   it('one-way data binding (ng2 -> ng1) through ng2 syntax', (done) => {
+    let executedLink = false;
     function ng1() {
       return {
         scope: {
@@ -132,6 +127,7 @@ describe('Upgrade: ', () => {
         },
         link: (scope: any, el: Element[], attrs: any) => {
           expect(scope.testVar).toEqual('ng2Var');
+          executedLink = true;
         }
       }
     }
@@ -139,17 +135,23 @@ describe('Upgrade: ', () => {
     
     @Component({
       selector: 'ng2',
-      template: '<div ng1 [testVar]="myVar">{{myVar}}</div>',
-      directives: [adapter.upgradeNg1Directive('ng1')]
+      template: '<div ng1 [testVar]="myVar">{{myVar}}</div>'
     })
     class ng2 {
       public myVar: string = 'ng2Var';
     }
-    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+
+    @NgModule({
+      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
     
     let element = html('<ng2></ng2>');
     adapter.bootstrap(element, ['testAppUpgrade'])
       .ready((ref: any) => {
+        expect(executedLink).toBeTruthy();
         ref.dispose();
         deleteHtml(element);
         done();
@@ -171,8 +173,7 @@ describe('Upgrade: ', () => {
     
     @Component({
       selector: 'ng2',
-      template: '<div ng1 [fn]="callMeFn"></div>',
-      directives: [adapter.upgradeNg1Directive('ng1')]
+      template: '<div ng1 [fn]="callMeFn"></div>'
     })
     class ng2 {
       public name = "ngAdapter"
@@ -185,7 +186,13 @@ describe('Upgrade: ', () => {
       }
       public callMeFn = this.callMe.bind(this);
     }
-    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    
+    @NgModule({
+      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
     
     spyOn(ng2.prototype, 'callMe').and.callThrough();
     
@@ -209,20 +216,13 @@ describe('Upgrade: ', () => {
     }
     
     let executedChagedEvent = false;
+    let executedLink = false;
     function ng1listen() {
       return {
         link: (scope: any, el: Element[], attrs: any) => {
           scope.$on('channel', (data: any) => {
             expect(data).toEqual('helloNg2');
-
-            // Angular RC3 will excute this befor bootstrap().ready
-            // Angular RC1 and lower execute this after befor bootstrap().ready
-            executedChagedEvent = true;
-            if (ref) {
-              ref.dispose();
-              deleteHtml(element); 
-              done();
-            }
+            executedLink = true;
           });
         }
       }
@@ -232,25 +232,26 @@ describe('Upgrade: ', () => {
     
     @Component({
       selector: 'ng2',
-      template: '<div><div ng1listen></div><div ng1broadcast></div></div>',
-      directives: [adapter.upgradeNg1Directive('ng1listen'),
-        adapter.upgradeNg1Directive('ng1broadcast')]
+      template: '<div><div ng1listen></div><div ng1broadcast></div></div>'
     })
     class ng2 {}
-    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    
+    @NgModule({
+      declarations: [adapter.upgradeNg1Directive('ng1listen'),
+        adapter.upgradeNg1Directive('ng1broadcast'), ng2]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
     
     let element = html('<ng2></ng2>');
     let ref: any;
     adapter.bootstrap(element, ['testAppUpgrade'])
-      .ready((_ref: any) => {
-        ref = _ref;
-
-        // Angular RC1 and lower execute this before chagedEvent is fired, RC3 after
-        if (executedChagedEvent) {
-          ref.dispose();
-          deleteHtml(element); 
-          done();
-        }
+      .ready((ref: any) => {
+        expect(executedLink).toBeTruthy();
+        ref.dispose();
+        deleteHtml(element); 
+        done();
       });
   });
   
@@ -269,11 +270,16 @@ describe('Upgrade: ', () => {
     
     @Component({
       selector: 'ng2',
-      template: '<div ng1></div>',
-      directives: [adapter.upgradeNg1Directive('ng1')]
+      template: '<div ng1></div>'
     })
     class ng2 {}
-    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    
+    @NgModule({
+      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
     
     let element = html('<ng2></ng2>');
     adapter.bootstrap(element, ['testAppUpgrade'])
@@ -302,11 +308,16 @@ describe('Upgrade: ', () => {
     
     @Component({
       selector: 'ng2',
-      template: '<div ng1></div>',
-      directives: [adapter.upgradeNg1Directive('ng1')]
+      template: '<div ng1></div>'
     })
     class ng2 {}
-    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    
+    @NgModule({
+      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
     
     let element = html('<ng2></ng2>');
     adapter.bootstrap(element, ['testAppUpgrade'])
@@ -325,7 +336,6 @@ describe('Upgrade: ', () => {
       public value: string = 'ng2Service';
       constructor() {}
     }
-    adapter.addProvider(ng2Service);
     
     function ng1(service: ng2Service) {
       return {
@@ -338,11 +348,17 @@ describe('Upgrade: ', () => {
     
     @Component({
       selector: 'ng2',
-      template: '<div ng1></div>',
-      directives: [adapter.upgradeNg1Directive('ng1')]
+      template: '<div ng1></div>'
     })
     class ng2 {}
-    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    
+    @NgModule({
+      declarations: [adapter.upgradeNg1Directive('ng1'), ng2],
+      providers: [ng2Service]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
     
     let element = html('<ng2></ng2>');
     adapter.bootstrap(element, ['testAppUpgrade'])
@@ -361,7 +377,6 @@ describe('Upgrade: ', () => {
       public value: string = 'ng2Service';
       constructor() {}
     }
-    adapter.addProvider(ng2Service);
     
     ng1.$inject = ['ng2Service'];
     function ng1(service: ng2Service) {
@@ -375,11 +390,17 @@ describe('Upgrade: ', () => {
     
     @Component({
       selector: 'ng2',
-      template: '<div ng1></div>',
-      directives: [adapter.upgradeNg1Directive('ng1')]
+      template: '<div ng1></div>'
     })
     class ng2 {}
-    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    
+    @NgModule({
+      declarations: [adapter.upgradeNg1Directive('ng1'), ng2],
+      providers: [ng2Service]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
     
     let element = html('<ng2></ng2>');
     adapter.bootstrap(element, ['testAppUpgrade'])
@@ -403,10 +424,9 @@ describe('Upgrade: ', () => {
               expect(newVal).toEqual('123');
               expect(oldVal).toEqual('abc');
               expect(_scope).toEqual(scope);
-              
               ref.dispose();
               deleteHtml(element);
-              done();
+              done();           
             }
           })
         }
@@ -417,30 +437,37 @@ describe('Upgrade: ', () => {
     let ng2Scope: any;
     @Component({
       selector: 'ng2',
-      template: '<div ng1 [(test)]="test">{{test}}</div>',
-      directives: [adapter.upgradeNg1Directive('ng1')]
+      template: '<div ng1 [(test)]="test">{{test}}</div>'
     })
     class ng2 {
       public test = 'abc';
       constructor() {ng2Scope = this; }
     }
-    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    
+    @NgModule({
+      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
     
     let element = html('<ng2></ng2>');
     let ref: any;
     adapter.bootstrap(element, ['testAppUpgrade'])
       .ready((_ref: any) => {
         ref = _ref;
-        ng2Scope.test = '123';
+        ng2Scope.test = '123';        
       });
   });
   
   it('attrs', (done) => {
+    let executeLink = false;
     function ng1() {
       return {
         link: (scope: any, el: Element[], attrs: any) => {
           expect(attrs.ng1).toEqual('');
           expect(attrs.class).toEqual('testCSS');
+          executeLink = true;
         }
       }
     }
@@ -448,16 +475,22 @@ describe('Upgrade: ', () => {
     
     @Component({
       selector: 'ng2',
-      template: '<div ng1 class="testCSS"></div>',
-      directives: [adapter.upgradeNg1Directive('ng1')]
+      template: '<div ng1 class="testCSS"></div>'
     })
     class ng2 {}
-    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    
+    @NgModule({
+      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
     
     let element = html('<ng2></ng2>');
     let ref: any;
     adapter.bootstrap(element, ['testAppUpgrade'])
       .ready((ref: any) => {
+        expect(executeLink).toBeTruthy();
         ref.dispose();
         deleteHtml(element);
         done();
@@ -496,14 +529,19 @@ describe('Upgrade: ', () => {
     let ng2Scope: any;
     @Component({
       selector: 'ng2',
-      template: '<div ng1 [(test)]="test"></div>',
-      directives: [adapter.upgradeNg1Directive('ng1')]
+      template: '<div ng1 [(test)]="test"></div>'
     })
     class ng2 {
       public test = 'abc';
       constructor() {ng2Scope = this; }
     }
-    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+
+    @NgModule({
+      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
     
     let element = html('<ng2></ng2>');
     let ref: any;
@@ -544,15 +582,17 @@ describe('Upgrade: ', () => {
       template: `
         <p ng1_1>abc</p>
         <p ng1_2>abc</p>
-      `,
-      directives: [
-        adapter.upgradeNg1Directive('ng1_1'),
-        adapter.upgradeNg1Directive('ng1_2')
-      ]
+      `
     })
     class ng2 {}
 
-    module.directive('ng2', <any>adapter.downgradeNg2Component(ng2));
+    @NgModule({
+      declarations: [adapter.upgradeNg1Directive('ng1_1'),
+        adapter.upgradeNg1Directive('ng1_2'), ng2]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
 
     let element = html('<ng2></ng2>');
     adapter.bootstrap(element, ['testAppUpgrade'])
