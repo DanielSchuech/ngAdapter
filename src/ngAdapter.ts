@@ -220,4 +220,17 @@ export class ngAdapter {
 
     return ng1Module.name;
   }
+
+  /**
+   * add an Angular 2 service to the Angular 2 root injector
+   * 
+   * @example
+   * @Injectable()
+   * class MyService {}
+   * adapter.addProvider(MyService);
+   */
+  addProvider(service: Type<any>) {
+    this.addedProviders.push(service);
+    (<any>this.upgradeAdapter).providers.push(service);
+  }
 }

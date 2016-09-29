@@ -38,11 +38,6 @@ let moduleName = adapter.downgradeNg2Module(MyNg2Module); //'MyNg2Module'
 angular.module('App').requires.push(moduleName);
 
 //downgrade Service
-@NgModule({
-  providers: [MyNg2Service]
-})
-class MyNg2Module {}
-adapter.addNg2Module(MyNg2Module);
 module.factory('myNg2Service', adapter.downgradeNg2Provider(MyNg2Service));
 ```
 
@@ -70,3 +65,19 @@ export class AppComponent {
 })
 class MyNg1Module {}
 ```
+
+## Angular 2 usage
+```typescript
+//add an Angular 2 Module to the hybrid app via addNg2Module
+@NgModule({
+  providers: [MyNg2Service]
+})
+class MyNg2Module {}
+adapter.addNg2Module(MyNg2Module);
+
+//add an Angular 2 service to the Angular 2 root injector
+@Injectable()
+class MyService {}
+adapter.addProvider(MyService);
+```
+
