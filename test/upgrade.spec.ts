@@ -55,8 +55,10 @@ describe('Upgrade: ', () => {
       }
     }
 
+    let types = [adapter.upgradeNg1Directive('ng1'), ng2];
     @NgModule({
-      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+      declarations: types,
+      exports: types
     })
     class Ng2Module {}
     adapter.addNg2Module(Ng2Module);
@@ -101,8 +103,11 @@ describe('Upgrade: ', () => {
         scope = this;
       }
     }
+
+    let types = [adapter.upgradeNg1Directive('ng1'), ng2];
     @NgModule({
-      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+      declarations: types,
+      exports: types
     })
     class Ng2Module {}
     adapter.addNg2Module(Ng2Module);
@@ -141,8 +146,10 @@ describe('Upgrade: ', () => {
       public myVar: string = 'ng2Var';
     }
 
+    let types = [adapter.upgradeNg1Directive('ng1'), ng2];
     @NgModule({
-      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+      declarations: types,
+      exports: types
     })
     class Ng2Module {}
     adapter.addNg2Module(Ng2Module);
@@ -187,8 +194,10 @@ describe('Upgrade: ', () => {
       public callMeFn = this.callMe.bind(this);
     }
     
+    let types = [adapter.upgradeNg1Directive('ng1'), ng2];
     @NgModule({
-      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+      declarations: types,
+      exports: types
     })
     class Ng2Module {}
     adapter.addNg2Module(Ng2Module);
@@ -236,9 +245,11 @@ describe('Upgrade: ', () => {
     })
     class ng2 {}
     
+    let types = [adapter.upgradeNg1Directive('ng1listen'),
+        adapter.upgradeNg1Directive('ng1broadcast'), ng2];
     @NgModule({
-      declarations: [adapter.upgradeNg1Directive('ng1listen'),
-        adapter.upgradeNg1Directive('ng1broadcast'), ng2]
+      declarations: types,
+      exports: types
     })
     class Ng2Module {}
     adapter.addNg2Module(Ng2Module);
@@ -274,8 +285,10 @@ describe('Upgrade: ', () => {
     })
     class ng2 {}
     
+    let types = [adapter.upgradeNg1Directive('ng1'), ng2];
     @NgModule({
-      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+      declarations: types,
+      exports: types
     })
     class Ng2Module {}
     adapter.addNg2Module(Ng2Module);
@@ -312,8 +325,10 @@ describe('Upgrade: ', () => {
     })
     class ng2 {}
     
+    let types = [adapter.upgradeNg1Directive('ng1'), ng2];
     @NgModule({
-      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+      declarations: types,
+      exports: types
     })
     class Ng2Module {}
     adapter.addNg2Module(Ng2Module);
@@ -352,8 +367,10 @@ describe('Upgrade: ', () => {
     })
     class ng2 {}
     
+    let types = [adapter.upgradeNg1Directive('ng1'), ng2];
     @NgModule({
-      declarations: [adapter.upgradeNg1Directive('ng1'), ng2],
+      declarations: types,
+      exports: types,
       providers: [ng2Service]
     })
     class Ng2Module {}
@@ -394,8 +411,10 @@ describe('Upgrade: ', () => {
     })
     class ng2 {}
     
+    let types = [adapter.upgradeNg1Directive('ng1'), ng2];
     @NgModule({
-      declarations: [adapter.upgradeNg1Directive('ng1'), ng2],
+      declarations: types,
+      exports: types,
       providers: [ng2Service]
     })
     class Ng2Module {}
@@ -444,8 +463,10 @@ describe('Upgrade: ', () => {
       constructor() {ng2Scope = this; }
     }
     
+    let types = [adapter.upgradeNg1Directive('ng1'), ng2];
     @NgModule({
-      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+      declarations: types,
+      exports: types
     })
     class Ng2Module {}
     adapter.addNg2Module(Ng2Module);
@@ -479,8 +500,10 @@ describe('Upgrade: ', () => {
     })
     class ng2 {}
     
+    let types = [adapter.upgradeNg1Directive('ng1'), ng2];
     @NgModule({
-      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+      declarations: types,
+      exports: types
     })
     class Ng2Module {}
     adapter.addNg2Module(Ng2Module);
@@ -536,8 +559,10 @@ describe('Upgrade: ', () => {
       constructor() {ng2Scope = this; }
     }
 
+    let types = [adapter.upgradeNg1Directive('ng1'), ng2];
     @NgModule({
-      declarations: [adapter.upgradeNg1Directive('ng1'), ng2]
+      declarations: types,
+      exports: types
     })
     class Ng2Module {}
     adapter.addNg2Module(Ng2Module);
@@ -586,9 +611,11 @@ describe('Upgrade: ', () => {
     })
     class ng2 {}
 
+    let types = [adapter.upgradeNg1Directive('ng1_1'),
+        adapter.upgradeNg1Directive('ng1_2'), ng2];
     @NgModule({
-      declarations: [adapter.upgradeNg1Directive('ng1_1'),
-        adapter.upgradeNg1Directive('ng1_2'), ng2]
+      declarations: types,
+      exports: types
     })
     class Ng2Module {}
     adapter.addNg2Module(Ng2Module);

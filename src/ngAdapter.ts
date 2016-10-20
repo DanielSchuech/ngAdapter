@@ -169,6 +169,7 @@ export class ngAdapter {
    * downgrade an added Angular 2 Module to an AngularJS Module
    * an AngularJS Module with the name of the given class/function will be created
    * returns name of module as string
+   * all directives, components und modules of the exports array will be downgraded
    * 
    * NgModule has to be added before downgrading
    * 
@@ -185,13 +186,9 @@ export class ngAdapter {
    * angular.module('App').requires.push(moduleName);
    */
   downgradeNg2Module(mod: Type<any>) {
-    if (this.ng2Modules.indexOf(mod) < 0) {
-      throw Error('NgModule has to be added with adapter.addNg2Module first!');
-    }
     let ng1Module = angular.module((<any>mod).name, []);
-
     let meta = Reflect.getOwnMetadata('annotations', mod)[0];
-    meta.declarations && meta.declarations.forEach((item: Type<any>) => {
+    meta.exports && meta.exports.forEach((item: Type<any>) => {
       let type = Reflect.getOwnMetadata('annotations', item)[0];
 
       //dont downgrade upgraded ng1 types
@@ -209,6 +206,11 @@ export class ngAdapter {
         //its a directive
         ng1Module.directive(dashToCamel(selector.substring(1, selector.length - 1)), 
           <any>this.downgradeNg2Directive(item));
+      }
+      if (type.exports) {
+        //its a module that contains the exports array
+        let moduleName = this.downgradeNg2Module(item);
+        ng1Module.requires.push(moduleName);
       }
     });
 

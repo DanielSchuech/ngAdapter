@@ -253,6 +253,7 @@ describe('Downgrade: ', () => {
 
     @NgModule({
       declarations: [ng2Dir, ng2],
+      exports: [ng2Dir, ng2],
       providers: [ng2Service]
     })
     class Ng2Module {}
@@ -269,6 +270,80 @@ describe('Downgrade: ', () => {
         expect(ref.ng1Injector.get('ng2Service').test).toEqual('123');
         expect((<any>element.firstChild).style.backgroundColor).toEqual('red');
         expect(element.firstChild.textContent).toEqual('component');
+
+        ref.dispose();
+        deleteHtml(element);
+        done();
+      });
+  });
+
+  it('downgradeNg2Module only exports available', (done) => {
+    @Component({
+      selector: 'one',
+      template: '1'
+    })
+    class One {}
+
+    @Component({
+      selector: 'two',
+      template: '2'
+    })
+    class Two {}
+
+    @NgModule({
+      declarations: [One, Two],
+      exports: [Two]
+    })
+    class Ng2ModuleExportsTest {}
+    adapter.addNg2Module(Ng2ModuleExportsTest);
+    adapter.downgradeNg2Module(Ng2ModuleExportsTest);
+    //Inject new ng1 modul into testApp modul
+    angular.module('testApp').requires.push('Ng2ModuleExportsTest');
+
+    let element = html('<one></one><two></two');
+    adapter.bootstrap(element, ['testApp'])
+      .ready((ref: any) => {
+        expect(element.textContent).toEqual('2');
+
+        ref.dispose();
+        deleteHtml(element);
+        done();
+      });
+  });
+
+  it('downgradeNg2Module recursive module', (done) => {
+    @Component({
+      selector: 'one',
+      template: '1'
+    })
+    class One {}
+
+    @Component({
+      selector: 'two',
+      template: '2'
+    })
+    class Two {}
+
+    @NgModule({
+      declarations: [Two],
+      exports: [Two]
+    })
+    class Ng2ModuleRecursive2 {}
+
+    @NgModule({
+      declarations: [One],
+      exports: [One, Ng2ModuleRecursive2]
+    })
+    class Ng2ModuleRecursive1 {}
+    adapter.addNg2Module(Ng2ModuleRecursive1);
+    adapter.downgradeNg2Module(Ng2ModuleRecursive1);
+    //Inject new ng1 modul into testApp modul
+    angular.module('testApp').requires.push('Ng2ModuleRecursive1');
+
+    let element = html('<one></one><two></two');
+    adapter.bootstrap(element, ['testApp'])
+      .ready((ref: any) => {
+        expect(element.textContent).toEqual('12');
 
         ref.dispose();
         deleteHtml(element);
