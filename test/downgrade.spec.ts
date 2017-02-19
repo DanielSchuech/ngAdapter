@@ -21,7 +21,7 @@ describe('Downgrade: ', () => {
     adapter = new ngAdapter(module);
   });
   
-  it('inject ElementRef', (done) => {
+  it('inject ElementRef', (done: any) => {
     @Directive({
       selector: '[ng2]'
     })
@@ -42,7 +42,7 @@ describe('Downgrade: ', () => {
       });
   });
   
-  it('inject ng2 Service', (done) => {
+  it('inject ng2 Service', (done: any) => {
     Injectable()
     class ng2Service {
       public value: string = 'ng2Service';
@@ -76,7 +76,7 @@ describe('Downgrade: ', () => {
       });
   });
   
-  it('inject ng1Service Service', (done) => {
+  it('inject ng1Service Service', (done: any) => {
     class ng1Service {
       public value = 'ng1Service';
     }
@@ -103,7 +103,7 @@ describe('Downgrade: ', () => {
       });
   });
   
-  it('initialise ng2 Services via providers setting', (done) => {
+  it('initialise ng2 Services via providers setting', (done: any) => {
     Injectable()
     class ng2Service {
       public value: string = 'ng2Service';
@@ -136,7 +136,7 @@ describe('Downgrade: ', () => {
       });
   });
   
-  it('two way data binding', (done) => {
+  it('two way data binding', (done: any) => {
     @Directive({
       selector: '[ng2]'
     })
@@ -169,7 +169,7 @@ describe('Downgrade: ', () => {
       });
   });
   
-  it('can call class function', (done) => {
+  it('can call class function', (done: any) => {
     let executed = false;
     @Directive({
       selector: '[ng2]'
@@ -195,7 +195,7 @@ describe('Downgrade: ', () => {
       });
   });
   
-  it('event binding via host setting (expect added event listener)', (done) => {    
+  it('event binding via host setting (expect added event listener)', (done: any) => {    
     @Directive({
       selector: '[ng2]',
       host: {
@@ -230,7 +230,7 @@ describe('Downgrade: ', () => {
       });
   });
 
-  it('downgradeNg2Module', (done) => {
+  it('downgradeNg2Module', (done: any) => {
     @Injectable()
     class ng2Service {
       public test = '123';
@@ -277,7 +277,7 @@ describe('Downgrade: ', () => {
       });
   });
 
-  it('downgradeNg2Module only exports available', (done) => {
+  it('downgradeNg2Module only exports available', (done: any) => {
     @Component({
       selector: 'one',
       template: '1'
@@ -311,7 +311,7 @@ describe('Downgrade: ', () => {
       });
   });
 
-  it('downgradeNg2Module recursive module', (done) => {
+  it('downgradeNg2Module recursive module', (done: any) => {
     @Component({
       selector: 'one',
       template: '1'
@@ -351,7 +351,7 @@ describe('Downgrade: ', () => {
       });
   });
 
-  it('downgradeNg2Module component with templateUrl', (done) => {
+  it('downgradeNg2Module component with templateUrl', (done: any) => {
     @Component({
       selector: 'ng2',
       templateUrl: 'base/test/test.html'

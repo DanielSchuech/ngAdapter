@@ -22,7 +22,7 @@ describe('Upgrade: ', () => {
 
   afterEach(() => destroyPlatform());
   
-  it('two-way data binding via event attribute', (done) => {    
+  it('two-way data binding via event attribute', (done: any) => {    
     function ng1() {
       return {
         scope: {
@@ -75,7 +75,7 @@ describe('Upgrade: ', () => {
       });
   });
   
-  it('two-way data binding via syntactic sugar', (done) => {
+  it('two-way data binding via syntactic sugar', (done: any) => {
     function ng1() {
       return {
         scope: {
@@ -123,7 +123,7 @@ describe('Upgrade: ', () => {
       });
   });
   
-  it('one-way data binding (ng2 -> ng1) through ng2 syntax', (done) => {
+  it('one-way data binding (ng2 -> ng1) through ng2 syntax', (done: any) => {
     let executedLink = false;
     function ng1() {
       return {
@@ -165,7 +165,7 @@ describe('Upgrade: ', () => {
       });
   });
   
-  it('function (&) binding', (done) => {
+  it('function (&) binding', (done: any) => {
     function ng1() {
       return {
         scope: {
@@ -215,7 +215,7 @@ describe('Upgrade: ', () => {
       });
   });
   
-  it('broadcast & listen on scope', (done) => {
+  it('broadcast & listen on scope', (done: any) => {
     function ng1broadcast() {
       return {
         link: (scope: any, element: Element[], attrs: any) => {
@@ -266,7 +266,7 @@ describe('Upgrade: ', () => {
       });
   });
   
-  it('inject ng1 service via inline array notation', (done) => {
+  it('inject ng1 service via inline array notation', (done: any) => {
     module.service('ng1Service', ng1Service);
     adapter.upgradeNg1Provider('ng1Service');
     
@@ -305,7 +305,7 @@ describe('Upgrade: ', () => {
       });
   });
   
-  it('inject ng1 service via $inject syntax', (done) => {
+  it('inject ng1 service via $inject syntax', (done: any) => {
     module.service('ng1Service', ng1Service);
     adapter.upgradeNg1Provider('ng1Service');
     
@@ -345,7 +345,7 @@ describe('Upgrade: ', () => {
       });
   });
   
-  it('inject ng2 service via inline array notation', (done) => {
+  it('inject ng2 service via inline array notation', (done: any) => {
     @Injectable()
     class ng2Service {
       public value: string = 'ng2Service';
@@ -388,7 +388,7 @@ describe('Upgrade: ', () => {
       });
   });
   
-  it('inject ng2 service via $inject syntax', (done) => {
+  it('inject ng2 service via $inject syntax', (done: any) => {
     @Injectable()
     class ng2Service {
       public value: string = 'ng2Service';
@@ -432,7 +432,7 @@ describe('Upgrade: ', () => {
       });
   });
   
-  it('scope $watch with string watchExpression', (done) => {
+  it('scope $watch with string watchExpression', (done: any) => {
     function ng1() {
       return {
         scope: {test: '='},
@@ -481,7 +481,7 @@ describe('Upgrade: ', () => {
       });
   });
   
-  it('attrs', (done) => {
+  it('attrs', (done: any) => {
     let executeLink = false;
     function ng1() {
       return {
@@ -520,7 +520,7 @@ describe('Upgrade: ', () => {
       });
   });
   
-  it('scope $watch with function watchExpression', (done) => {
+  it('scope $watch with function watchExpression', (done: any) => {
     function ng1() {
       return {
         scope: {test: '='},
@@ -577,7 +577,7 @@ describe('Upgrade: ', () => {
       });
   });
 
-  it('module can has another module as require which does exists jet', (done) => {
+  it('module can has another module as require which does exists jet', (done: any) => {
     module = angular.module('webendApp', ['notExistingModule', 'new']);
     adapter = new ngAdapter(module);
 
@@ -597,7 +597,7 @@ describe('Upgrade: ', () => {
       });
   });
 
-  it('upgrade two directives', (done) => {
+  it('upgrade two directives', (done: any) => {
     module
       .directive('ng1_1', () => {return {link: ($scope, el) => {(<any>el)[0].innerHTML = '#1'; }}; })
       .directive('ng1_2', () => {return {link: ($scope, el) => {(<any>el)[0].innerHTML = '#2'; }}; });
