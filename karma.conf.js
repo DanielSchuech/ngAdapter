@@ -104,6 +104,11 @@ module.exports = function(config) {
     },
     
     //How long will Karma wait for a message from a browser before disconnecting from it (in ms).
-    browserNoActivityTimeout: 300000
+    browserNoActivityTimeout: 300000,
+
+    //recognize ts files as script
+    mime: {
+      'text/x-typescript': ['ts','tsx']
+    },
   });
 }; 
