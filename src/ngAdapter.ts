@@ -197,7 +197,7 @@ export class ngAdapter {
       }
       
       let selector = type.selector
-      if (selector && type.template && !isUpgraded(selector)) {
+      if (selector && (type.template || type.templateUrl) && !isUpgraded(selector)) {
         //its a component
         ng1Module.directive(dashToCamel(selector), <any>this.downgradeNg2Component(item));
       }

@@ -350,4 +350,33 @@ describe('Downgrade: ', () => {
         done();
       });
   });
+
+  it('downgradeNg2Module component with templateUrl', (done) => {
+    @Component({
+      selector: 'ng2',
+      templateUrl: 'base/test/test.html'
+    })
+    class ng2 {}
+
+    @NgModule({
+      declarations: [ng2],
+      exports: [ng2]
+    })
+    class Ng2Module {}
+    adapter.addNg2Module(Ng2Module);
+    adapter.downgradeNg2Module(Ng2Module);
+
+    //Inject new ng1 modul into testApp modul
+    angular.module('testApp').requires.push('Ng2Module');
+
+    let element = html('<ng2></ng2>');
+    adapter.bootstrap(element, ['testApp'])
+      .ready((ref: any) => {
+        expect(element.firstChild.textContent).toEqual('TestCase');
+
+        ref.dispose();
+        deleteHtml(element);
+        done();
+      });
+  });
 });

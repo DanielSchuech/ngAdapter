@@ -29,6 +29,7 @@ module.exports = function(config) {
       'node_modules/zone.js/dist/zone.js',
       {pattern: 'node_modules/reflect-metadata/Reflect.js.map', included: false, serve: true},
       'node_modules/angular/angular.js',
+      {pattern: 'test/test.html', included: false, serve: true},
       `test/**/${process.argv[process.argv.indexOf('--part') + 1]}.spec.ts`
     ],
 
