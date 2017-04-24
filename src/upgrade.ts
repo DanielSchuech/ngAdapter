@@ -79,8 +79,8 @@ export class Upgrade {
     
     /** Inline Array Notation */
     if (Array.isArray(directive)) {
-      let fn = <Function>directive.splice(directive.length - 1, 1)[0];
-      let dependencies = <string[]>directive;
+      let fn = <Function>directive[directive.length - 1];
+      let dependencies = <string[]>directive.slice(0, directive.length - 1);
       return {
         function: fn,
         dependencies: dependencies
