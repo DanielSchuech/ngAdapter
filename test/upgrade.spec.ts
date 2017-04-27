@@ -577,7 +577,7 @@ describe('Upgrade: ', () => {
   });
 
   it('module can has another module as require which does exists jet', (done: any) => {
-    module = angular.module('webendApp', ['notExistingModule', 'new']);
+    module = angular.module('webendApp', ['notYetExistingModule', 'new']);
     adapter = new ngAdapter(module);
 
     angular.module('new', [])
@@ -585,8 +585,10 @@ describe('Upgrade: ', () => {
 
     let dir = adapter.upgradeNg1Directive('ng1');
 
+    angular.module('notYetExistingModule', []);
+
     let element = html('<ng2></ng2>');
-    adapter.bootstrap(element, ['testAppUpgrade'])
+    adapter.bootstrap(element, ['webendApp'])
       .ready((ref: any) => {
         expect(dir).toBeDefined();
 

@@ -7,10 +7,7 @@
     "build": "tsc",
     "build-w": "tsc -w",
     "watch": "watch \"npm run build\" src",
-    "test": "npm run test-upgrade && npm run test-downgrade && npm run mergeLCOVs",
-    "test-upgrade": "karma start --singleRun true --part upgrade",
-    "test-downgrade": "karma start --singleRun true --part downgrade",
-    "mergeLCOVs": "./node_modules/.bin/lcov-result-merger log/coverage/*.info log/coverage/lcov.info"
+    "test": "karma start --singleRun true"
   },
   "repository": {
     "type": "git",
@@ -56,7 +53,6 @@
     "karma-firefox-launcher": "^0.1.7",
     "karma-jasmine": "^0.3.8",
     "karma-jasmine-html-reporter": "^0.2.0",
-    "lcov-result-merger": "^1.2.0",
     "reflect-metadata": "^0.1.10",
     "rxjs": "^5.0.1",
     "through2": "^2.0.1",

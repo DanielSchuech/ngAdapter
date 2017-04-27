@@ -30,7 +30,7 @@ module.exports = function(config) {
       {pattern: 'node_modules/reflect-metadata/Reflect.js.map', included: false, serve: true},
       'node_modules/angular/angular.js',
       {pattern: 'test/test.html', included: false, serve: true},
-      `test/**/${process.argv[process.argv.indexOf('--part') + 1]}.spec.ts`
+      `test/**/*.spec.ts`
     ],
 
     // list of files to exclude
@@ -46,24 +46,24 @@ module.exports = function(config) {
     browserify: {
       debug: true,
       bundleDelay: 1500,
-      transform: [
-        coverageTransform,
-        istanbul({ignore: ['**/*.html'], instrumenter: require('isparta')})
-      ],
-        plugin: [
-          ['tsify', {
-            target: 'es5',
-            declaration: true,
-            sourceMap: true,
-            experimentalDecorators: true
-          }]
-        ]
-      },
+      // transform: [
+      //   coverageTransform,
+      //   istanbul({ignore: ['**/*.html'], instrumenter: require('isparta')})
+      // ],
+      plugin: [
+        ['tsify', {
+          target: 'es5',
+          declaration: true,
+          sourceMap: true,
+          experimentalDecorators: true
+        }]
+      ]
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress', 'kjhtml', 'coverage'],
+    reporters: ['progress', 'kjhtml', /*'coverage'*/],
     
     
     // web server port
