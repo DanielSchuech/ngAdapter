@@ -46,10 +46,10 @@ module.exports = function(config) {
     browserify: {
       debug: true,
       bundleDelay: 1500,
-      // transform: [
-      //   coverageTransform,
-      //   istanbul({ignore: ['**/*.html'], instrumenter: require('isparta')})
-      // ],
+      transform: [
+        coverageTransform,
+        istanbul({ignore: ['**/*.html'], instrumenter: require('isparta')})
+      ],
       plugin: [
         ['tsify', {
           target: 'es5',
@@ -63,7 +63,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress', 'kjhtml', /*'coverage'*/],
+    reporters: ['progress', 'kjhtml', 'coverage'],
     
     
     // web server port
@@ -97,10 +97,8 @@ module.exports = function(config) {
       reporters:[
         //{type: 'html', dir:'log/coverage/html', subdir: '.'},
         //{type: 'cobertura', dir:'log/coverage/', subdir: '.'}
-        {type: 'html', dir:'log/coverage/', 
-          subdir: process.argv[process.argv.indexOf('--part') + 1]},
-        {type: 'lcovonly', dir:'log/coverage/', subdir: '.', 
-          file: process.argv[process.argv.indexOf('--part') + 1] + '.info'}
+        {type: 'html', dir:'log/coverage/', subdir: '.'},
+        {type: 'lcovonly', dir:'log/coverage/', subdir: '.'}
       ],
     },
     
