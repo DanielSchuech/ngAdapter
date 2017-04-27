@@ -1,6 +1,7 @@
 import {UpgradeAdapter} from '@angular/upgrade';
 import {Type, ElementRef, Provider, NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
+import * as angular from 'angular';
 
 import {Downgrade} from './downgrade';
 import {Upgrade} from './upgrade';

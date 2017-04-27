@@ -8,12 +8,11 @@
     "experimentalDecorators": true,
     "removeComments": false,
     "noImplicitAny": true,
-    "outDir": "build"
+    "outDir": "build",
+    "lib": ["es6", "dom"]
   },
   "exclude": [
     "node_modules",
-    "typings/main",
-    "typings/main.d.ts",
     "build",
     "test"
   ]

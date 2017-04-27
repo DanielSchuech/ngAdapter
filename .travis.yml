@@ -4,7 +4,6 @@ node_js:
   - "5"
   
 before_script:
-  - typings install
   - git reset --hard HEAD
   - npm i codeclimate-test-reporter
   - export DISPLAY=:99.0

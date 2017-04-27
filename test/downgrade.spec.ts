@@ -1,9 +1,8 @@
-///<reference path="../typings/browser.d.ts" />
-
 import {ngAdapter} from '../src/ngAdapter';
 import {UpgradeAdapter} from '@angular/upgrade';
 import {Directive, ElementRef, Injectable, Input, 
   NgModule, Component} from '@angular/core';
+import * as angular from 'angular';
 import {html, deleteHtml} from './helper';
 
 describe('Downgrade: ', () => {

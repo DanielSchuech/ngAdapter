@@ -1,6 +1,7 @@
 import {UpgradeAdapter} from '@angular/upgrade';
 import {ElementRef, Type, Directive, Injector, Input, EventEmitter,
     OnInit, DoCheck, NgZone} from '@angular/core';
+import * as angular from 'angular';
 import {ScopeEvents} from './scopeevents';
 import {Scope} from './scope';
 import {camelToDash, dashToCamel} from './helper';
@@ -98,7 +99,7 @@ export class Upgrade {
   /**
    * create a directive
    */
-  createDirective(selector: string, fn: Function, deps: string[]) {
+  createDirective(selector: string, fn: Function, deps: ReadonlyArray<string>) {
     //evaluate bindings
     let bindings = Object.keys(fn().scope || {});
     
@@ -146,7 +147,7 @@ export class Upgrade {
         let attrs = createAttrs(this.element);
         
         //add ng1 jquery addition to element
-        let el = angular.element([this.element.nativeElement]);
+        let el = angular.element(this.element.nativeElement);
         
         directive.link(scope, el, attrs);
       }
@@ -179,7 +180,7 @@ export class Upgrade {
  * inputs array of dependencies as string + more needed information
  * return array with dependencies objects
  */
-function determineDependencies(deps: string[], injector: Injector, addedProviders: any, 
+function determineDependencies(deps: ReadonlyArray<string>, injector: Injector, addedProviders: any, 
       upgradedProviders: string[]) {
   let dependencies: any[] = [];
   deps && deps.forEach((dep: string) => {
